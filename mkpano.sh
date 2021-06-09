@@ -17,18 +17,18 @@ fi
 # Set proper options for rest of script 
 set -euox pipefail
 
-PROJ="project.pto"
+PROJ="project_$(basename "$INFOLDER").pto"
 KEYCACHE="keypoints.cache"
 
 # 1: create the project file
-pto_gen -p 1 -o "$PROJ" $INFOLDER/*
+pto_gen -f 1 -p 1 -o "$PROJ" $INFOLDER/*
 
 # 2: create control points 
 # Linear match with linear match length of 3
 # Cache keypoints 
 # Work on full scale data as the pictures are small (1920*1080)
 cpfind \
-  --linearmatch --linearmatchlen 3 \
+  --linearmatch --linearmatchlen 5 \
   -c --keypath "$KEYCACHE" \
   --fullscale \
   -o "$PROJ" "$PROJ"
@@ -44,13 +44,13 @@ NIMGS="$(find "$INFOLDER" -type f | wc -l)"
   
 # 4: Optimize panorama 
 # --------------------
-# Optimise view except first, trX, trY
+# Optimise positions to get a good start
 # Set aside the list of control points
 ./use_ctrpts.R "$PROJ" "scan"
 for (( N=1; N<$NIMGS; N++ )); do 
   imgn=$N
   imgp=$(( N - 1 ))
-  pto_var --opt "TrX$imgn,TrY$imgn" -o "$PROJ" "$PROJ"
+  pto_var --opt "TrX$imgn,TrY$imgn,r$imgn" -o "$PROJ" "$PROJ"
   # Use only control points of the pair of images 
   ./use_ctrpts.R "$PROJ" "$imgp" "$imgn"
   autooptimiser -n -o "$PROJ" "$PROJ" || true
@@ -58,7 +58,7 @@ done
 
 # Now use all control points, and refit the whole panorama
 ./use_ctrpts.R "$PROJ" "all"
-pto_var --opt "TrX,TrY,TrZ" -o "$PROJ" "$PROJ"
+pto_var --opt "TrX,TrY,r" -o "$PROJ" "$PROJ"
 autooptimiser -n -o "$PROJ" "$PROJ"
 
 # 3: Cleanup control points 

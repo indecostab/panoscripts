@@ -3,6 +3,9 @@
 # This script will split a video into frames every xx seconds
 # 
 
+# Options 
+FFMPEG_OPTS=""
+
 function usage { 
   echo "Usage $0 <inputvid> <output fps (s)> [<skip length (s)>]"
   exit 1
@@ -45,6 +48,8 @@ else
   mkdir "$OUTPUT_FOLDER"
 fi
 
-# ffmpeg 
-ffmpeg -i "$INPUTVID" -ss "$SKIP" -vf "fps=$HERTZ" "$OUTPUT_FOLDER/%006d.png"
+# Launch ffmpeg 
+ffmpeg -i "$INPUTVID" $FFMPEG_OPTS \
+  -ss "$SKIP" -vf "fps=$HERTZ" \
+  "$OUTPUT_FOLDER/%006d.png"
 
