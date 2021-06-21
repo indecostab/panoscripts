@@ -46,3 +46,10 @@ input folder as argument:
 mkpano.sh <input_folder>
 ```
 
+# Links & Resources
+
+These tools are part of the [http://indecostab.eu/](INDECOSTAB project). 
+INDECOSTAB has received funding from the European Union’s Horizon 2020 research 
+and innovation programme under the Marie Skłodowska-Curie grant agreement 
+No 896159. 
+
